@@ -81,18 +81,18 @@ def entry_formatter(entries):
 #there are a lot of different routes to go here
 
 
-
-def main():
-    results = lookup(sys.argv[1], "collegiate")
-    try:
-        entries = entry_maker(results);
-        entries = entry_formatter(entries);
-    except AttributeError:
-        print "word not in dictionary, here are some suggestions:";
-        for sug in results.iter('suggestion'):
-            print sug.text
-
-main();
+# 
+# def main():
+#     results = lookup(sys.argv[1], "collegiate")
+#     try:
+#         entries = entry_maker(results);
+#         entries = entry_formatter(entries);
+#     except AttributeError:
+#         print "word not in dictionary, here are some suggestions:";
+#         for sug in results.iter('suggestion'):
+#             print sug.text
+#
+# main();
 
 
 
