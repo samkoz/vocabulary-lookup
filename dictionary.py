@@ -27,6 +27,7 @@ def entry_maker(XML):
     entries = []
 
     #some print statements for feedback
+    #will need to erase these when running w/o command line
     print ET.tostring(XML, encoding='utf8', method='xml')
     print ET.tostring(XML[0], encoding='utf-8', method='xml');
 
