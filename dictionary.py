@@ -23,28 +23,51 @@ def lookup(word, dict_type):
 #this function should get all the variables we are interested in
 def entry_maker(XML):
     entries = []
-    for entry in enumerate(XML):
-        entry_order = entry[0]
-        entry = entry[1]
-        word = entry.find('ew').text.encode('utf-8');
+    print ET.tostring(XML, encoding='utf8', method='xml')
 
-        def_list = []
-        for el in entry.iter('et'):
-            etymology = el.text.encode('utf-8');
+    #check if not a word
+    suggestion_list = [];
+    if XML.findall('suggestion') is not None:
+        sug_list = []
+        for sug in XML.iter('suggestion'):
+            suggestion = sug.text.encode('utf-8');
+            sug_list.append(suggestion)
+        entries = [{'word' : None, 'suggestions' : sug_list}];
 
-        for el in entry.iter('fl'):
-            grammer = el.text.encode('utf-8');
+    else:
+        for entry in enumerate(XML):
+            entry_order = entry[0]
+            entry = entry[1]
+            word = entry.find('ew').text.encode('utf-8');
 
-        for el in entry.iter('dt'):
-            df = el.text.encode('utf-8');
-            df = df.replace(':', '')
-            df = df.rstrip();
-            if len(df )> 0:
-                df = '-' + df;
-                def_list.append(df);
+            def_list = []
+            try:
+                for el in entry.iter('et'):
+                    etymology = el.text.encode('utf-8');
+            except AttributeError:
+                etymology = None
 
-        entries.append({'word' : word, 'order' : entry_order, 'etymology' : etymology, 'grammer' : grammer, 'definitions' : def_list});
+            for el in entry.iter('fl'):
+                grammer = el.text.encode('utf-8');
+
+            for el in entry.iter('dt'):
+                df = el.text.encode('utf-8');
+                df = df.replace(':', '')
+                df = df.rstrip();
+                if len(df )> 0:
+                    df = '-' + df;
+                    def_list.append(df);
+            entries.append({'word' : word, 'order' : entry_order, 'etymology' : etymology, 'grammer' : grammer, 'definitions' : def_list});
+
     return entries;
+
+
+    # for sug in XML.iter('suggestion'):
+    #     suggestion_list.append(sug);
+    # if len(suggestion_list)>0:
+
+
+
 
 #sketching this up:
 # Num: word, noun/verb/adj
@@ -58,22 +81,31 @@ def entry_maker(XML):
 # entries = entry_maker(result_XML);
 
 def entry_formatter(entries):
+    query = entries[0]['word'];
     count = 1;
     formatted_def = ""
-    for e in entries:
-        def_string = ""
-        word = e['word']
-        ety = e['etymology']
-        gram = e['grammer']
-        defs = e['definitions'];
+    if query != None:
+        for e in entries:
+            def_string = ""
+            word = e['word']
+            ety = e['etymology']
+            gram = e['grammer']
+            defs = e['definitions'];
 
-        def_string += "{0}: {1}\n Grammer: {2}, Etymology: {3}\n".format(count, word, gram, ety);
-        for d in defs:
-            def_string += "{}\n".format(d);
-        def_string += '\n'
-        formatted_def += def_string;
-        count += 1;
-    return (word, formatted_def);
+            def_string += "{0}: {1}\n Grammer: {2}, Etymology: {3}\n".format(count, word, gram, ety);
+            for d in defs:
+                def_string += "{}\n".format(d);
+            def_string += '\n'
+            formatted_def += def_string;
+            count += 1;
+    else:
+        formatted_def = "Word not found - listed below are some suggestions.\n"
+        for e in entries:
+            sugs = e['suggestions'];
+            for s in sugs:
+                formatted_def += "{0}: {1}\n".format(count, s);
+                count += 1;
+    return (query, formatted_def);
 
 # f_entries = entry_formatter(entries);
 # print f_entries;
@@ -81,7 +113,7 @@ def entry_formatter(entries):
 #there are a lot of different routes to go here
 
 
-# 
+#
 # def main():
 #     results = lookup(sys.argv[1], "collegiate")
 #     try:
