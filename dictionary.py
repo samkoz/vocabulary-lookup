@@ -2,6 +2,7 @@
 
 import urllib2;
 import xml.etree.ElementTree as ET;
+import sys;
 #ElementTree is the whole XML file
 #Element is a node in that file
 
@@ -9,32 +10,15 @@ import xml.etree.ElementTree as ET;
 col_dic_example = "http://www.dictionaryapi.com/api/v1/references/collegiate/xml/test?key=3f7480b2-e927-42bd-aebe-dfab617b5acb"
 
 #medical dictionary example
-#http://www.dictionaryapi.com/api/references/medical/v2/xml/test?key=20ab3427-bf97-49c6-b248-43ddce7bfdb8
+med_dic_example = "http://www.dictionaryapi.com/api/references/medical/v2/xml/test?key=20ab3427-bf97-49c6-b248-43ddce7bfdb8"
 
-response = urllib2.urlopen(col_dic_example)
-result = response.read()
-
-# print result
-#print type(result)
-
-result_XML = ET.fromstring(result)
-print type(result_XML)
-print type(result_XML[0])
-
-print result_XML.tag
-entries = list(result_XML)
-
-#need to figure out what components of the definition we want...
-
-for entry in result_XML:
-    print "ENTRY: ", entry.tag, entry.attrib, entry.text
-    for definition in entry.iter():
-        try:
-            print definition.tag, definition.attrib, definition.text
-        except:
-            print definition.tag, definition.attrib, definition.text.encode('utf-8');
-
-
+def lookup(word, dict_type):
+    """Will keep a placeholder for dict type right now"""
+    URL_lookup = "http://www.dictionaryapi.com/api/v1/references/collegiate/xml/{}?key=3f7480b2-e927-42bd-aebe-dfab617b5acb".format(word);
+    print URL_lookup
+    response = urllib2.urlopen(URL_lookup)
+    result = ET.fromstring(response.read());
+    return result;
 
 #this function should get all the variables we are interested in
 def entry_maker(XML):
@@ -42,7 +26,6 @@ def entry_maker(XML):
     for entry in enumerate(XML):
         entry_order = entry[0]
         entry = entry[1]
-        print entry
         word = entry.find('ew').text.encode('utf-8');
 
         def_list = []
@@ -72,7 +55,7 @@ def entry_maker(XML):
 # entry.et.text
 # for x in entry.iter('dt'): x.text
 
-entries = entry_maker(result_XML);
+# entries = entry_maker(result_XML);
 
 def entry_formatter(entries):
     count = 1;
@@ -90,10 +73,26 @@ def entry_formatter(entries):
         def_string += '\n'
         formatted_def += def_string;
         count += 1;
-    return formatted_def;
+    return (word, formatted_def);
 
-f_entries = entry_formatter(entries);
-print f_entries;
+# f_entries = entry_formatter(entries);
+# print f_entries;
+
+#there are a lot of different routes to go here
+
+
+
+def main():
+    results = lookup(sys.argv[1], "collegiate")
+    try:
+        entries = entry_maker(results);
+        entries = entry_formatter(entries);
+    except AttributeError:
+        print "word not in dictionary, here are some suggestions:";
+        for sug in results.iter('suggestion'):
+            print sug.text
+
+main();
 
 
 
