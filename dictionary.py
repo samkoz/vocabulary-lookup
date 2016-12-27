@@ -34,14 +34,7 @@ for entry in result_XML:
         except:
             print definition.tag, definition.attrib, definition.text.encode('utf-8');
 
-#sketching this up:
-# Num: word, noun/verb/adj
-# etymology
-# definition list
 
-# ennumerate: entry.ew.text, entry.fl.text
-# entry.et.text
-# for x in entry.iter('dt'): x.text
 
 #this function should get all the variables we are interested in
 def entry_maker(XML):
@@ -70,10 +63,40 @@ def entry_maker(XML):
         entries.append({'word' : word, 'order' : entry_order, 'etymology' : etymology, 'grammer' : grammer, 'definitions' : def_list});
     return entries;
 
-definitions = entry_maker(result_XML)
-for x in definitions:
-    print x['etymology'];
-    print x['definitions']
+#sketching this up:
+# Num: word, noun/verb/adj
+# etymology
+# definition list
+
+# ennumerate: entry.ew.text, entry.fl.text
+# entry.et.text
+# for x in entry.iter('dt'): x.text
+
+entries = entry_maker(result_XML);
+
+def entry_formatter(entries):
+    count = 1;
+    formatted_def = ""
+    for e in entries:
+        def_string = ""
+        word = e['word']
+        ety = e['etymology']
+        gram = e['grammer']
+        defs = e['definitions'];
+
+        def_string += "{0}: {1}\n Grammer: {2}, Etymology: {3}\n".format(count, word, gram, ety);
+        for d in defs:
+            def_string += "{}\n".format(d);
+        def_string += '\n'
+        formatted_def += def_string;
+        count += 1;
+    return formatted_def;
+
+f_entries = entry_formatter(entries);
+print f_entries;
+
+
+
 
 # for child in result_XML.iter('dt'):
 #     print child.tag, child.attrib, child.text
