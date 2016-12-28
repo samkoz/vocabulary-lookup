@@ -1,10 +1,13 @@
 from Tkinter import *
 import traceback;
 import dictionary;
+import save_result;
 
 
 class App:
     def __init__(self, master):
+        self.query = ''
+        self.definition = ''
         self.frame = Frame(master)
         self.frame.pack();
 
@@ -37,24 +40,42 @@ class App:
                 lookup_URL = dictionary.lookup(word, "m");
             else:
                 lookup_URL = dictionary.lookup(word, "c");
+
             results = dictionary.entry_maker(lookup_URL)
             formatted_results = dictionary.entry_formatter(results)
+
+            #update definition and query to save them if user decides to add them
+            self.definition_update(formatted_results);
+            self.query_update(formatted_results);
+
+            #display results
             self.text_display.delete(1.0, END);
             self.text_display.insert(END, formatted_results[1])
+
         except Exception as e:
+            #this error occurs if no text is entered OR if there are no suggesions...
+            #NEED TO ACCOUNT FOR SUGGESTIONS COMPONENT
             if type(e).__name__ == 'IndexError':
                 pass;
             elif type(e).__name__ == "ParseError":
+                #this is for multiple word entries
                 self.text_display.delete(1.0, END);
                 self.text_display.insert(END, "-did you enter more than one word?\n-only enter one word at a time into the above query.")
             else:
+                #general print for all error statements at this point
                 tb = traceback.format_exc();
                 self.text_display.delete(1.0, END);
                 self.text_display.insert(END, tb);
 
 
     def save_result(self):
-        pass;
+        if save_result.word_check(self.query):
+            self.text_display.delete(1.0, END);
+            self.text_display.insert(END, "-the word {0} is already in your vocabulary dictionary.".format(self.query));
+        else:
+            save_result.add_word(self.query, self.definition)
+            self.text_display.delete(1.0, END);
+            self.text_display.insert(END, "-the word {0} was saved to your vocabulary dictionary".format(self.query));
 
     def med_dict_check(self):
         toggle = self.dict_toggle.get()
@@ -62,6 +83,12 @@ class App:
             return True;
         else:
             return False;
+
+    def definition_update(self, results):
+        self.definition = results[1];
+
+    def query_update(self, results):
+        self.query = results[0];
 
 root = Tk()
 app = App(root);

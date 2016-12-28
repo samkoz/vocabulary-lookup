@@ -2,7 +2,6 @@
 
 import urllib2;
 import xml.etree.ElementTree as ET;
-import sys;
 #ElementTree is the whole XML file
 #Element is a node in that file
 
@@ -17,9 +16,15 @@ def lookup(word, dict_type):
         URL_lookup = "http://www.dictionaryapi.com/api/v1/references/collegiate/xml/{}?key=3f7480b2-e927-42bd-aebe-dfab617b5acb".format(word);
     elif dict_type == "m":
         URL_lookup = "http://www.dictionaryapi.com/api/references/medical/v2/xml/{}?key=20ab3427-bf97-49c6-b248-43ddce7bfdb8".format(word);
-    print URL_lookup
-    response = urllib2.urlopen(URL_lookup)
-    result = ET.fromstring(response.read());
+    #print URL_lookup
+    try:
+        response = urllib2.urlopen(URL_lookup)
+        result = ET.fromstring(response.read());
+    except:
+        pass
+        #raise an exception here if they are not connected to the internet.
+        #this will need to be passed to an above function?
+        #figure this out
     return result;
 
 #this function should get all the variables we are interested in
@@ -28,8 +33,8 @@ def entry_maker(XML):
 
     #some print statements for feedback
     #will need to erase these when running w/o command line
-    print ET.tostring(XML, encoding='utf8', method='xml')
-    print ET.tostring(XML[0], encoding='utf-8', method='xml');
+    # print ET.tostring(XML, encoding='utf8', method='xml')
+    # print ET.tostring(XML[0], encoding='utf-8', method='xml');
 
     #check if not a word; then format it according to suggestion parameters
     suggestion_list = [];
@@ -74,12 +79,11 @@ def entry_maker(XML):
     return entries;
 
 
-
-
 def entry_formatter(entries):
     query = entries[0]['word'];
     count = 1;
     formatted_def = ""
+    #this conditional statement was added to differentiate queires with definitions vs. suggestsions
     if query != None:
         for e in entries:
             def_string = ""
