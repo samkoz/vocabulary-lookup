@@ -92,7 +92,7 @@ def entry_formatter(entries):
             gram = e['grammer']
             defs = e['definitions'];
 
-            def_string += "{0}: {1}\n Grammer: {2}, Etymology: {3}\n".format(count, word, gram, ety);
+            def_string += "{0}: {1}\nGrammer: {2}, Etymology: {3}\n".format(count, word, gram, ety);
             for d in defs:
                 def_string += "{}\n".format(d);
             def_string += '\n'

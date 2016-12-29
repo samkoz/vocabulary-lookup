@@ -3,7 +3,6 @@ import traceback;
 import dictionary;
 import save_result;
 
-
 class App:
     def __init__(self, master):
         self.query = ''
@@ -12,11 +11,10 @@ class App:
         self.frame.pack();
 
         self.look_up_entry = Entry(self.frame)
+        self.look_up_entry.bind("<Return>", self.look_up)
+        self.look_up_entry.bind("<Control-a>", self.select_text)
         self.look_up_entry.pack();
         self.look_up_entry.delete(0, END)
-
-        self.look_up_button = Button(self.frame, text="Look up word", command=self.look_up);
-        self.look_up_button.pack(side=TOP)
 
         self.save_result_button = Button(self.frame, text="Save result", command=self.save_result);
         self.save_result_button.pack(side=TOP);
@@ -33,7 +31,11 @@ class App:
         self.text_display.pack(side=BOTTOM)
         self.text_display.insert(END, '-type a word above and press enter to get its definition.\n-it will search the normal, collegiate dictionary by default.\n-check the medical dictionary to use that instead.')
 
-    def look_up(self):
+    def select_text(self, event):
+        self.look_up_entry.select_range(0, END);
+        return "break"
+
+    def look_up(self, event):
         try:
             word = self.look_up_entry.get()
             if self.med_dict_check():
@@ -56,7 +58,8 @@ class App:
             #this error occurs if no text is entered OR if there are no suggesions...
             #NEED TO ACCOUNT FOR SUGGESTIONS COMPONENT
             if type(e).__name__ == 'IndexError':
-                pass;
+                self.text_display.delete(1.0, END);
+                self.text_display.insert(END, "-you either misspelled a word so badly that there are no suggested corrections or you did not enter a word to search.\n-type a word you would like to look up the definition for and press enter.")
             elif type(e).__name__ == "ParseError":
                 #this is for multiple word entries
                 self.text_display.delete(1.0, END);

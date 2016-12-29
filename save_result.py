@@ -16,10 +16,13 @@ def add_word(word, definition):
     #need GUI to display that it has been added
 
 def word_check(word):
-    dictionary = pd.read_csv('dictionary.csv', index_col=0);
-    print dictionary.index;
-    if word in dictionary.index:
-        return True;
-    else:
+    #this exception catcher was implemented to handle creation of the csv file
+    try:
+        dictionary = pd.read_csv('dictionary.csv', index_col=0);
+        print dictionary.index;
+        if word in dictionary.index:
+            return True;
+        else:
+            return False;
+    except IOError:
         return False;
-        #need GUI to display word already exists
