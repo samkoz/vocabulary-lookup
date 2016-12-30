@@ -17,23 +17,36 @@ class App:
         self.look_up_entry.delete(0, END)
 
         self.save_result_button = Button(self.frame, text="Save result", command=self.save_result);
+        self.save_result_button.bind("<Return>", self.save_shortcut)
         self.save_result_button.pack(side=TOP);
 
         self.quit_button = Button(self.frame, text="Quit", command=self.frame.quit);
+        self.quit_button.bind("<Return>", lambda e: self.frame.quit())
         self.quit_button.pack(side=TOP);
 
         self.dict_toggle = IntVar();
-        #this will be 1 if th button is selected; otherwise 0
+        #this will be 1 if the button is selected; otherwise 0
         self.check_button = Checkbutton(self.frame, text="Medical Dictionary", variable=self.dict_toggle);
+        self.check_button.bind("<Return>", self.checkbox_shortcut)
         self.check_button.pack();
 
-        self.text_display = Text(self.frame)
+        self.text_display = Text(self.frame, wrap=WORD);
         self.text_display.pack(side=BOTTOM)
         self.text_display.insert(END, '-type a word above and press enter to get its definition.\n-it will search the normal, collegiate dictionary by default.\n-check the medical dictionary to use that instead.')
+
+    def save_shortcut(self, event):
+        print "enter pressed"
+        self.save_result()
 
     def select_text(self, event):
         self.look_up_entry.select_range(0, END);
         return "break"
+
+    def checkbox_shortcut(self, event):
+        if self.dict_toggle.get() == 1:
+            self.check_button.deselect();
+        else:
+            self.check_button.select();
 
     def look_up(self, event):
         try:
@@ -70,9 +83,11 @@ class App:
                 self.text_display.delete(1.0, END);
                 self.text_display.insert(END, tb);
 
-
     def save_result(self):
-        if save_result.word_check(self.query):
+        if self.query == "":
+            self.text_display.delete(1.0, END);
+            self.text_display.insert(END, "-enter a word you would like to define");
+        elif save_result.word_check(self.query):
             self.text_display.delete(1.0, END);
             self.text_display.insert(END, "-the word {0} is already in your vocabulary dictionary.".format(self.query));
         else:
@@ -94,6 +109,7 @@ class App:
         self.query = results[0];
 
 root = Tk()
+root.title("Dictionary")
 app = App(root);
 
 root.mainloop()
