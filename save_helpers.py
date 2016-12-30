@@ -1,25 +1,18 @@
-#save result
-
-#plan:
-#read an existing csv file with pandas
-#check to make sure the word of interest is not already in the csv file
-#display a message that the entry already exists in the file
-#write the entry to csv file if it is not in there
-
+#save helper functions for dictionary.py
 import csv;
 import pandas as pd;
 
 def add_word(word, definition):
+    """will add word to csv file"""
     with open('dictionary.csv', 'ab+') as csvfile:
         dict_writer = csv.writer(csvfile, delimiter = ',', quoting = csv.QUOTE_MINIMAL)
         dict_writer.writerow([word, definition])
-    #need GUI to display that it has been added
 
 def word_check(word):
-    #this exception catcher was implemented to handle creation of the csv file
+    """will check csv file to see if the current word-definition pair is present; it will add the word if not\na csv file (dictionary.csv) will be created if one does not already exist."""
+    #this exception  was implemented to handle creation of the csv file
     try:
         dictionary = pd.read_csv('dictionary.csv', index_col=0);
-        print dictionary.index;
         if word in dictionary.index:
             return True;
         else:
